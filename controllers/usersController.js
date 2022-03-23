@@ -19,9 +19,12 @@ module.exports.getUserById = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Невалидный id пользователя' });
+      }
+      return res
         .status(500)
         .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
