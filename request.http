@@ -1,0 +1,52 @@
+GET http://localhost:3000/users
+
+###
+POST http://localhost:3000/users
+Content-Type: application/json
+
+{
+    "name": "Maria",
+    "about": "girl",
+    "avatar": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+}
+
+###
+
+GET http://localhost:3000/users/623a1284706be78d96ab9db8
+
+###
+
+POST http://localhost:3000/cards
+Content-Type: application/json
+
+{
+    "name": "Girl",
+    "link": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+}
+
+
+###
+GET http://localhost:3000/cards
+
+###
+DELETE http://localhost:3000/cards/623a1617dc86338f2435daac/likes
+
+###
+PUT http://localhost:3000/cards/623a1617dc86338f2435daac/likes
+
+###
+PATCH http://localhost:3000/users/me
+Content-Type: application/json
+
+{
+    "name": "Maria",
+    "about": "girl"
+}
+
+###
+PATCH http://localhost:3000/users/me/avatar
+Content-Type: application/json
+
+{
+    "avatar": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+}
