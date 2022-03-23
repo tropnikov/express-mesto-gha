@@ -1,11 +1,14 @@
 const Card = require('../models/card');
 const ErrorNotFound = require('../Errors/ErrorNotFound');
+// const ValidationError = require('../Errors/ValidationError');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((data) => res.send({ data }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -15,7 +18,12 @@ module.exports.createCard = (req, res) => {
   Card.create({ name, link, owner })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Невалидные данные карточки' });
+      }
+      return res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -27,9 +35,14 @@ module.exports.deleteCardById = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Невалидный id карточки' });
+      }
+      return res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -45,9 +58,14 @@ module.exports.likeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Невалидный id карточки' });
+      }
+      return res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -63,8 +81,13 @@ module.exports.dislikeCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.name === 'CastError') {
+        return res.status(400).send({ message: 'Невалидный id карточки' });
+      }
+      return res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };

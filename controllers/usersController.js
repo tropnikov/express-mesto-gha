@@ -14,7 +14,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -33,7 +33,12 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res
+      if (err.name === 'ValidationError') {
+        return res
+          .status(400)
+          .send({ message: 'Невалидные данные пользователя' });
+      }
+      return res
         .status(500)
         .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
@@ -52,14 +57,17 @@ module.exports.updateProfile = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Невалидные данные пользователя' });
+      }
+      return res
         .status(500)
         .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
@@ -77,14 +85,17 @@ module.exports.updateAvatar = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
       if (err.statusCode === 404) {
-        res.status(404).send({ message: err.errorMessage });
+        return res.status(404).send({ message: err.errorMessage });
       }
-      res
+      if (err.name === 'ValidationError') {
+        return res.status(400).send({ message: 'Невалидный id или ссылка' });
+      }
+      return res
         .status(500)
         .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });

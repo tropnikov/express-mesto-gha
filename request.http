@@ -5,7 +5,7 @@ POST http://localhost:3000/users
 Content-Type: application/json
 
 {
-    "name": "Maria",
+    "name": "ф",
     "about": "girl",
     "avatar": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
 }
@@ -19,7 +19,7 @@ POST http://localhost:3000/cards
 Content-Type: application/json
 
 {
-    "name": "AAA",
+    "name": "A",
     "link": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
 }
 
@@ -27,13 +27,13 @@ Content-Type: application/json
 ###
 GET http://localhost:3000/cards
 ###
-DELETE http://localhost:3000/cards/623a1617dc86338f2435daad
+DELETE http://localhost:3000/cards/623a1617dc863382435daad
 
 ###
-DELETE http://localhost:3000/cards/623a1617dc86338f2435daac/likes
+DELETE http://localhost:3000/cards/623a1617dc86338f2435333daac/likes
 
 ###
-PUT http://localhost:3000/cards/623a1617dc86338f2435daac/likes
+PUT http://localhost:3000/cards/623a1617укукdc86338f2435daac/likes
 
 ###
 PATCH http://localhost:3000/users/me
@@ -49,5 +49,5 @@ PATCH http://localhost:3000/users/me/avatar
 Content-Type: application/json
 
 {
-    "avatar": "https://images.unsplash.com/photo-1647815567584-9fd320e4f039?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2340&q=80"
+    "avatar": {}
 }
