@@ -1,4 +1,5 @@
 const Card = require('../models/card');
+const ErrorNotFound = require('../Errors/ErrorNotFound');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -20,8 +21,14 @@ module.exports.createCard = (req, res) => {
 
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
       res.status(500).send({ message: 'Произошла ошибка', error: err });
     });
 };
@@ -32,8 +39,14 @@ module.exports.likeCard = (req, res) => {
     { $addToSet: { likes: req.user._id } },
     { new: true },
   )
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
       res.status(500).send({ message: 'Произошла ошибка', error: err });
     });
 };
@@ -43,8 +56,15 @@ module.exports.dislikeCard = (req, res) => {
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
-  ).then((card) => res.send({ data: card }))
+  )
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
+    .then((card) => res.send({ data: card }))
     .catch((err) => {
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
       res.status(500).send({ message: 'Произошла ошибка', error: err });
     });
 };

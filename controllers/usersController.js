@@ -1,18 +1,29 @@
 const User = require('../models/user');
+const ErrorNotFound = require('../Errors/ErrorNotFound');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
     .then((data) => res.send({ data }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -22,7 +33,9 @@ module.exports.createUser = (req, res) => {
   User.create({ name, about, avatar })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -38,9 +51,17 @@ module.exports.updateProfile = (req, res) => {
       upsert: true,
     },
   )
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
 
@@ -55,8 +76,16 @@ module.exports.updateAvatar = (req, res) => {
       runValidators: true,
     },
   )
+    .orFail(() => {
+      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+    })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
-      res.status(500).send({ message: 'Произошла ошибка', error: err });
+      if (err.statusCode === 404) {
+        res.status(404).send({ message: err.errorMessage });
+      }
+      res
+        .status(500)
+        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
     });
 };
