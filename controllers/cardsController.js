@@ -1,14 +1,19 @@
 const Card = require('../models/cardModel');
-const ErrorNotFound = require('../Errors/ErrorNotFound');
+const ErrorNotFound = require('../errors/ErrorNotFound');
 // const ValidationError = require('../Errors/ValidationError');
+const {
+  NOT_FOUND_CODE,
+  BAD_REQUEST_CODE,
+  INTERNAL_SERVER_ERROR_CODE,
+} = require('../errors/errorCodes');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
     .then((data) => res.send({ data }))
-    .catch((err) => {
+    .catch(() => {
       res
-        .status(500)
-        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
     });
 };
 
@@ -19,30 +24,36 @@ module.exports.createCard = (req, res) => {
     .then((card) => res.send({ data: card }))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        return res.status(400).send({ message: 'Невалидные данные карточки' });
+        return res
+          .status(BAD_REQUEST_CODE)
+          .send({ message: 'Невалидные данные карточки' });
       }
       return res
-        .status(500)
-        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
     });
 };
 
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
-      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
+      throw new ErrorNotFound(
+        `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
+      );
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.errorMessage });
+      if (err.statusCode === NOT_FOUND_CODE) {
+        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id карточки' });
+        return res
+          .status(BAD_REQUEST_CODE)
+          .send({ message: 'Невалидный id карточки' });
       }
       return res
-        .status(500)
-        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
     });
 };
 
@@ -53,19 +64,23 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
+      throw new ErrorNotFound(
+        `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
+      );
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.errorMessage });
+      if (err.statusCode === NOT_FOUND_CODE) {
+        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id карточки' });
+        return res
+          .status(BAD_REQUEST_CODE)
+          .send({ message: 'Невалидный id карточки' });
       }
       return res
-        .status(500)
-        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
     });
 };
 
@@ -76,18 +91,22 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
+      throw new ErrorNotFound(
+        `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
+      );
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
-      if (err.statusCode === 404) {
-        return res.status(404).send({ message: err.errorMessage });
+      if (err.statusCode === NOT_FOUND_CODE) {
+        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
       }
       if (err.name === 'CastError') {
-        return res.status(400).send({ message: 'Невалидный id карточки' });
+        return res
+          .status(BAD_REQUEST_CODE)
+          .send({ message: 'Невалидный id карточки' });
       }
       return res
-        .status(500)
-        .send({ message: 'Произошла внутренняя ошибка сервера', error: err });
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
     });
 };
