@@ -1,4 +1,4 @@
-const Card = require('../models/card');
+const Card = require('../models/cardModel');
 const ErrorNotFound = require('../Errors/ErrorNotFound');
 // const ValidationError = require('../Errors/ValidationError');
 
@@ -30,7 +30,7 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
@@ -53,7 +53,7 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
@@ -76,7 +76,7 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет карточки с id ${req.params.cardId}`);
+      throw new ErrorNotFound(`Запрашиваемая карточка с id ${req.params.cardId} не найдена`);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {

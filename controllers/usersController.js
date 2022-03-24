@@ -1,4 +1,4 @@
-const User = require('../models/user');
+const User = require('../models/userModel');
 const ErrorNotFound = require('../Errors/ErrorNotFound');
 
 module.exports.getUsers = (req, res) => {
@@ -14,7 +14,7 @@ module.exports.getUsers = (req, res) => {
 module.exports.getUserById = (req, res) => {
   User.findById(req.params.userId)
     .orFail(() => {
-      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
+      throw new ErrorNotFound(`Запрашиваемый пользователь с id ${req.params.userId} не найден`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -60,7 +60,7 @@ module.exports.updateProfile = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
+      throw new ErrorNotFound(`Запрашиваемый пользователь с id ${req.params.userId} не найден`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
@@ -88,7 +88,7 @@ module.exports.updateAvatar = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(`Нет пользователя с id ${req.params.userId}}`);
+      throw new ErrorNotFound(`Запрашиваемый пользователь с id ${req.params.userId} не найден`);
     })
     .then((user) => res.send({ data: user }))
     .catch((err) => {
