@@ -22,10 +22,6 @@ app.use((req, res, next) => {
 app.use('/users', usersRoutes);
 app.use('/cards', cardsRoutes);
 
-app.get('/', (req, res) => {
-  res.send('Hello, world!');
-});
-
 app.use((req, res) => {
   res.status(404).send({ message: 'Страница не найдена =(' });
 });
