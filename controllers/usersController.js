@@ -3,24 +3,17 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
+const ValidationError = require('../errors/ValidationError');
 
-const {
-  NOT_FOUND_CODE,
-  BAD_REQUEST_CODE,
-  INTERNAL_SERVER_ERROR_CODE,
-} = require('../errors/errorCodes');
+const UnauthorizedError = require('../errors/UnauthorizedError');
 
-module.exports.getUsers = (req, res) => {
+module.exports.getUsers = (req, res, next) => {
   User.find({})
     .then((data) => res.send({ data }))
-    .catch(() => {
-      res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
-    });
+    .catch(next);
 };
 
-module.exports.getProfile = (req, res) => {
+module.exports.getProfile = (req, res, next) => {
   const id = req.user._id;
   User.findById(id)
     .orFail(() => {
@@ -28,46 +21,32 @@ module.exports.getProfile = (req, res) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND_CODE) {
-        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
-      }
       if (err.name === 'CastError') {
-        return res
-          .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидный id пользователя', err });
+        next(new ValidationError('Невалидный id пользователя'));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   User.findById(req.params.userId)
     .orFail(() => {
       throw new NotFoundError(
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND_CODE) {
-        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
-      }
       if (err.name === 'CastError') {
-        return res
-          .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидный id пользователя', err });
+        next(new ValidationError('Невалидный id пользователя'));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name, about, avatar, email, password,
   } = req.body;
@@ -88,24 +67,16 @@ module.exports.createUser = (req, res) => {
       email,
       password: hash,
     }))
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      // next(err);
       if (err.name === 'ValidationError') {
-        return res
-          .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидные данные пользователя', err });
+        next(new ValidationError('Невалидный id пользователя'));
       }
-      if (err.statusCode === 409) {
-        return res.status(409).send({ message: 'Ты уже зареган', err });
-      }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-module.exports.updateProfile = (req, res) => {
+module.exports.updateProfile = (req, res, next) => {
   const { name, about } = req.body;
 
   User.findByIdAndUpdate(
@@ -121,23 +92,16 @@ module.exports.updateProfile = (req, res) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND_CODE) {
-        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
-      }
       if (err.name === 'ValidationError') {
-        return res
-          .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидные данные пользователя' });
+        next(new ValidationError('Невалидный id пользователя'));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-module.exports.updateAvatar = (req, res) => {
+module.exports.updateAvatar = (req, res, next) => {
   const { avatar } = req.body;
 
   User.findByIdAndUpdate(
@@ -153,23 +117,16 @@ module.exports.updateAvatar = (req, res) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.send({ data: user }))
+    .then((user) => res.status(200).send({ data: user }))
     .catch((err) => {
-      if (err.statusCode === NOT_FOUND_CODE) {
-        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
-      }
       if (err.name === 'ValidationError') {
-        return res
-          .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидный id или ссылка' });
+        next(new ValidationError('Невалидный id пользователя'));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+      return next(err);
     });
 };
 
-module.exports.login = (req, res) => {
+module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
 
   return User.findUserByCredentials(email, password)
@@ -179,7 +136,7 @@ module.exports.login = (req, res) => {
         'some-secret-key',
         { expiresIn: '7d' },
       );
-      res.send({ token });
+      res.status(200).send({ token });
       // res
       //   .cookie('jwt', token, {
       //     maxAge: 3600000 * 24,
@@ -188,8 +145,9 @@ module.exports.login = (req, res) => {
       //   .end();
     })
     .catch((err) => {
-      res
-        .status(401)
-        .send({ message: err.message });
+      if (err.name === 'ValidationError') {
+        next(new UnauthorizedError('Невалидный id пользователя'));
+      }
+      return next(err);
     });
 };
