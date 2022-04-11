@@ -37,6 +37,7 @@ const userSchema = new mongoose.Schema({
     select: false,
     validate: {
       validator(pass) {
+        // eslint-disable-next-line
         const re = /^\w+\:\/\/[\w-]+\.?[\w-]*\.?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*$/gm;
         re.test(pass);
       },
