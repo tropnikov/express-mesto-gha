@@ -22,7 +22,7 @@ const signin = celebrate({
 
 const getUser = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().hex().required().length(24),
+    userId: Joi.string().hex().required().length(24),
   }),
 });
 
@@ -58,7 +58,7 @@ const createCardVal = celebrate({
 
 const deleteLikeDislikeCard = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().hex().required().length(24),
+    cardId: Joi.string().hex().required().length(24),
   }),
 });
 

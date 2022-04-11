@@ -28,12 +28,12 @@ POST http://localhost:3000/signup
 Content-Type: application/json
 
 {
-  "email": "maks@wokewd.com",
+  "email": "maks@woererekewd.com",
   "password": "dfsdknsds"
 }
 
 ###
-GET http://localhost:3000/users/me
+GET http://localhost:3000/users/62531f1ec897bd71bf4d5687
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU0MzkyOGYyOGQyMGVhNmRjNGM4MDIiLCJpYXQiOjE2NDk2ODY4MzUsImV4cCI6MTY1MDI5MTYzNX0._eAp-X0Fj_Zx_4AeQYCAzXH1dfhT0apFNeQ-WFxyDA4
 
 ###
@@ -63,6 +63,7 @@ PUT http://localhost:3000/cards/623a1617укукdc86338f2435daac/likes
 ###
 PATCH http://localhost:3000/users/me
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2MjU0MzkyOGYyOGQyMGVhNmRjNGM4MDIiLCJpYXQiOjE2NDk2ODY4MzUsImV4cCI6MTY1MDI5MTYzNX0._eAp-X0Fj_Zx_4AeQYCAzXH1dfhT0apFNeQ-WFxyDA4
 
 {
     "name": "Maria",

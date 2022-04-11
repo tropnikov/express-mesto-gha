@@ -4,6 +4,22 @@ const bcrypt = require('bcryptjs');
 const UnauthorizedError = require('../errors/UnauthorizedError');
 
 const userSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
+    unique: true,
+    validate: {
+      validator(mail) {
+        return validator.isEmail(mail);
+      },
+      message: 'Некорректный email',
+    },
+  },
+  password: {
+    type: String,
+    select: false,
+    required: true,
+  },
   name: {
     type: String,
     minlength: 2,
@@ -18,32 +34,17 @@ const userSchema = new mongoose.Schema({
   },
   avatar: {
     type: String,
+    validate: {
+      validator(link) {
+        return validator.isURL(link, {
+          protocols: ['http', 'https'],
+          require_protocol: true,
+        });
+      },
+      message: 'Некорректная ссылка',
+    },
     default:
       'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
-    validate: {
-      validator(pass) {
-        // eslint-disable-next-line
-        const re = /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=\/]*)/;
-        return pass.match(re);
-      },
-    },
-  },
-  email: {
-    type: String,
-    required: true,
-    unique: true,
-    validate: {
-      validator(mail) {
-        validator.isEmail(mail);
-      },
-      message: 'Пользователь с таким email уже зарегистрирован',
-    },
-  },
-  password: {
-    type: String,
-    required: true,
-    minlength: 8,
-    select: false,
   },
 });
 

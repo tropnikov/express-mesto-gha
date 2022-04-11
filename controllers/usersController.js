@@ -67,7 +67,11 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => {
+      const userWithoutPass = user.toObject();
+      delete userWithoutPass.password;
+      res.status(200).send({ data: userWithoutPass });
+    })
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Невалидный id пользователя'));
@@ -131,11 +135,9 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign(
-        { _id: user._id },
-        'some-secret-key',
-        { expiresIn: '7d' },
-      );
+      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
+        expiresIn: '7d',
+      });
       res.status(200).send({ token });
       // res
       //   .cookie('jwt', token, {
