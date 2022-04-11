@@ -38,8 +38,8 @@ const userSchema = new mongoose.Schema({
     validate: {
       validator(pass) {
         // eslint-disable-next-line
-        const re = /^\w+\:\/\/[\w-]+\.?[\w-]*\.?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*$/gm;
-        re.test(pass);
+        const re = /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=\/]*)/;
+        return pass.match(re);
       },
     },
   },
