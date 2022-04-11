@@ -19,10 +19,10 @@ app.use(express.json());
 app.post('/signin', signin, login);
 app.post('/signup', register, createUser);
 
-app.use(auth);
+// app.use(auth);
 
-app.use('/users', usersRoutes);
-app.use('/cards', cardsRoutes);
+app.use('/users', auth, usersRoutes);
+app.use('/cards', auth, cardsRoutes);
 
 app.use((req, res) => {
   res.status(404).send({ message: 'Страница не найдена =(' });
