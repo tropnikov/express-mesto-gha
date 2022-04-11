@@ -1,5 +1,9 @@
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
-const ErrorNotFound = require('../errors/ErrorNotFound');
+const ConflictError = require('../errors/ConflictError');
+const NotFoundError = require('../errors/NotFoundError');
+
 const {
   NOT_FOUND_CODE,
   BAD_REQUEST_CODE,
@@ -16,10 +20,11 @@ module.exports.getUsers = (req, res) => {
     });
 };
 
-module.exports.getUserById = (req, res) => {
-  User.findById(req.params.userId)
+module.exports.getProfile = (req, res) => {
+  const id = req.user._id;
+  User.findById(id)
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
@@ -31,7 +36,30 @@ module.exports.getUserById = (req, res) => {
       if (err.name === 'CastError') {
         return res
           .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидный id пользователя' });
+          .send({ message: 'Невалидный id пользователя', err });
+      }
+      return res
+        .status(INTERNAL_SERVER_ERROR_CODE)
+        .send({ message: 'Произошла внутренняя ошибка сервера' });
+    });
+};
+
+module.exports.getUserById = (req, res) => {
+  User.findById(req.params.userId)
+    .orFail(() => {
+      throw new NotFoundError(
+        `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
+      );
+    })
+    .then((user) => res.send({ data: user }))
+    .catch((err) => {
+      if (err.statusCode === NOT_FOUND_CODE) {
+        return res.status(NOT_FOUND_CODE).send({ message: err.errorMessage });
+      }
+      if (err.name === 'CastError') {
+        return res
+          .status(BAD_REQUEST_CODE)
+          .send({ message: 'Невалидный id пользователя', err });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
@@ -40,15 +68,36 @@ module.exports.getUserById = (req, res) => {
 };
 
 module.exports.createUser = (req, res) => {
-  const { name, about, avatar } = req.body;
+  const {
+    name, about, avatar, email, password,
+  } = req.body;
 
-  User.create({ name, about, avatar })
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        throw new ConflictError(
+          'Пользователь с таким email уже зарегистрирован',
+        );
+      }
+      return bcrypt.hash(password, 10);
+    })
+    .then((hash) => User.create({
+      name,
+      about,
+      avatar,
+      email,
+      password: hash,
+    }))
     .then((user) => res.send({ data: user }))
     .catch((err) => {
+      // next(err);
       if (err.name === 'ValidationError') {
         return res
           .status(BAD_REQUEST_CODE)
-          .send({ message: 'Невалидные данные пользователя' });
+          .send({ message: 'Невалидные данные пользователя', err });
+      }
+      if (err.statusCode === 409) {
+        return res.status(409).send({ message: 'Ты уже зареган', err });
       }
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
@@ -68,7 +117,7 @@ module.exports.updateProfile = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
@@ -100,7 +149,7 @@ module.exports.updateAvatar = (req, res) => {
     },
   )
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
@@ -117,5 +166,30 @@ module.exports.updateAvatar = (req, res) => {
       return res
         .status(INTERNAL_SERVER_ERROR_CODE)
         .send({ message: 'Произошла внутренняя ошибка сервера' });
+    });
+};
+
+module.exports.login = (req, res) => {
+  const { email, password } = req.body;
+
+  return User.findUserByCredentials(email, password)
+    .then((user) => {
+      const token = jwt.sign(
+        { _id: user._id },
+        'some-secret-key',
+        { expiresIn: '7d' },
+      );
+      res.send({ token });
+      // res
+      //   .cookie('jwt', token, {
+      //     maxAge: 3600000 * 24,
+      //     httpOnly: true,
+      //   })
+      //   .end();
+    })
+    .catch((err) => {
+      res
+        .status(401)
+        .send({ message: err.message });
     });
 };

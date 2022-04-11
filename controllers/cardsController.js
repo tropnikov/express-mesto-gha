@@ -1,19 +1,17 @@
 const Card = require('../models/cardModel');
-const ErrorNotFound = require('../errors/ErrorNotFound');
-// const ValidationError = require('../Errors/ValidationError');
+const NotFoundError = require('../errors/NotFoundError');
+const ForbiddenError = require('../errors/ForbiddenError');
 const {
   NOT_FOUND_CODE,
   BAD_REQUEST_CODE,
   INTERNAL_SERVER_ERROR_CODE,
 } = require('../errors/errorCodes');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((data) => res.send({ data }))
-    .catch(() => {
-      res
-        .status(INTERNAL_SERVER_ERROR_CODE)
-        .send({ message: 'Произошла внутренняя ошибка сервера' });
+    .catch((err) => {
+      next(err);
     });
 };
 
@@ -37,9 +35,14 @@ module.exports.createCard = (req, res) => {
 module.exports.deleteCardById = (req, res) => {
   Card.findByIdAndRemove(req.params.cardId)
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
       );
+    })
+    .then((card) => {
+      if (card.owner.toString() !== req.user._id) {
+        throw new ForbiddenError('Чужие карточки удалять нельзя');
+      }
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
@@ -64,7 +67,7 @@ module.exports.likeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
       );
     })
@@ -91,7 +94,7 @@ module.exports.dislikeCard = (req, res) => {
     { new: true },
   )
     .orFail(() => {
-      throw new ErrorNotFound(
+      throw new NotFoundError(
         `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
       );
     })
