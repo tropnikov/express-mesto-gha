@@ -35,6 +35,12 @@ const userSchema = new mongoose.Schema({
     required: true,
     minlength: 8,
     select: false,
+    validate: {
+      validator(pass) {
+        const re = /^\w+\:\/\/[\w-]+\.?[\w-]*\.?[\w\-\.\~\:\/\?\#\[\]\@\!\$\&\'\(\)\*\+\,\;\=]*$/gm;
+        re.test(pass);
+      },
+    },
   },
 });
 
