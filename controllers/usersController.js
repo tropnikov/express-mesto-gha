@@ -17,16 +17,11 @@ module.exports.getProfile = (req, res, next) => {
   User.findById(id)
     .orFail(() => {
       throw new NotFoundError(
-        `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
+        `Запрашиваемый пользователь с id ${req.user._id} не найден`,
       );
     })
     .then((user) => res.status(200).send({ data: user }))
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        next(new ValidationError('Невалидный id пользователя'));
-      }
-      return next(err);
-    });
+    .catch((err) => next(err));
 };
 
 module.exports.getUserById = (req, res, next) => {
@@ -145,10 +140,8 @@ module.exports.login = (req, res, next) => {
       //   })
       //   .end();
     })
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        next(new UnauthorizedError('Невалидный id пользователя'));
-      }
-      return next(err);
+    .catch(() => {
+      next(new UnauthorizedError('Невалидный id пользователя'));
+      // return next(err);
     });
 };

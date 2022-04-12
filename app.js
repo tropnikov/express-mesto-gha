@@ -7,6 +7,7 @@ const { login, createUser } = require('./controllers/usersController');
 const errorHandler = require('./middlewares/errorHandler');
 const auth = require('./middlewares/auth');
 const { register, signin } = require('./middlewares/validation');
+const NotFoundError = require('./errors/NotFoundError');
 
 const { PORT = 3000 } = process.env;
 
@@ -19,13 +20,13 @@ app.use(express.json());
 app.post('/signin', signin, login);
 app.post('/signup', register, createUser);
 
-// app.use(auth);
+app.use(auth);
 
-app.use('/users', auth, usersRoutes);
-app.use('/cards', auth, cardsRoutes);
+app.use('/users', usersRoutes);
+app.use('/cards', cardsRoutes);
 
-app.use((req, res) => {
-  res.status(404).send({ message: 'Страница не найдена =(' });
+app.use((req, res, next) => {
+  next(new NotFoundError('Страница не найдена =('));
 });
 
 app.use(errors());

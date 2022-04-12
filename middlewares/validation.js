@@ -3,12 +3,11 @@ const { celebrate, Joi } = require('celebrate');
 const register = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
     avatar: Joi.string().pattern(
-      // eslint-disable-next-line
-      /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=\/]*)/,
+      /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=/]*)/,
     ),
   }),
 });
@@ -16,7 +15,7 @@ const register = celebrate({
 const signin = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
+    password: Joi.string().required(),
   }),
 });
 
@@ -38,8 +37,7 @@ const updateAvatarVal = celebrate({
     avatar: Joi.string()
       .required()
       .pattern(
-        // eslint-disable-next-line
-        /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=\/]*)/,
+        /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=/]*)/,
       ),
   }),
 });
@@ -50,8 +48,7 @@ const createCardVal = celebrate({
     link: Joi.string()
       .required()
       .pattern(
-        // eslint-disable-next-line
-        /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=\/]*)/,
+        /https?:\/\/(w{3}\.)?[-\w@:%.+~#=]+\.[\w()]+([-\w()@:%+.~#?&=/]*)/,
       ),
   }),
 });

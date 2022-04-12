@@ -13,4 +13,4 @@ node_modules
 .DS_Store
 .idea
 .vscode
-.http
+request.http
