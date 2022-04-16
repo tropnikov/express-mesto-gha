@@ -5,7 +5,7 @@ const ValidationError = require('../errors/ValidationError');
 
 module.exports.getCards = (req, res, next) => {
   Card.find({})
-    .then((data) => res.send({ data }))
+    .then((cards) => res.send(cards))
     .catch((err) => {
       next(err);
     });
@@ -15,7 +15,7 @@ module.exports.createCard = (req, res, next) => {
   const { name, link } = req.body;
   const owner = req.user._id;
   Card.create({ name, link, owner })
-    .then((card) => res.status(200).send({ data: card }))
+    .then((card) => res.status(200).send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Невалидные данные карточки'));
@@ -58,7 +58,7 @@ module.exports.likeCard = (req, res, next) => {
         `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
       );
     })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Невалидный id карточки'));
@@ -78,7 +78,7 @@ module.exports.dislikeCard = (req, res, next) => {
         `Запрашиваемая карточка с id ${req.params.cardId} не найдена`,
       );
     })
-    .then((card) => res.send({ data: card }))
+    .then((card) => res.send(card))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Невалидный id карточки'));

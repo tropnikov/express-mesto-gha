@@ -1,14 +1,15 @@
+const { NODE_ENV, SECRET_KEY } = process.env;
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const User = require('../models/userModel');
 const ConflictError = require('../errors/ConflictError');
 const NotFoundError = require('../errors/NotFoundError');
-const ValidationError = require('../errors/ValidationError');
 const UnauthorizedError = require('../errors/UnauthorizedError');
+const ValidationError = require('../errors/ValidationError');
+const User = require('../models/userModel');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
-    .then((data) => res.send({ data }))
+    .then((users) => res.send(users))
     .catch(next);
 };
 
@@ -20,7 +21,7 @@ module.exports.getProfile = (req, res, next) => {
         `Запрашиваемый пользователь с id ${req.user._id} не найден`,
       );
     })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => next(err));
 };
 
@@ -31,7 +32,7 @@ module.exports.getUserById = (req, res, next) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
         next(new ValidationError('Невалидный id пользователя'));
@@ -64,7 +65,7 @@ module.exports.createUser = (req, res, next) => {
     .then((user) => {
       const userWithoutPass = user.toObject();
       delete userWithoutPass.password;
-      res.status(200).send({ data: userWithoutPass });
+      res.status(200).send(userWithoutPass);
     })
     .catch((err) => {
       if (err.name === 'ValidationError') {
@@ -90,7 +91,7 @@ module.exports.updateProfile = (req, res, next) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Невалидный id пользователя'));
@@ -115,7 +116,7 @@ module.exports.updateAvatar = (req, res, next) => {
         `Запрашиваемый пользователь с id ${req.params.userId} не найден`,
       );
     })
-    .then((user) => res.status(200).send({ data: user }))
+    .then((user) => res.status(200).send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
         next(new ValidationError('Невалидный id пользователя'));
@@ -129,19 +130,29 @@ module.exports.login = (req, res, next) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ _id: user._id }, 'some-secret-key', {
-        expiresIn: '7d',
-      });
-      res.status(200).send({ token });
-      // res
-      //   .cookie('jwt', token, {
-      //     maxAge: 3600000 * 24,
-      //     httpOnly: true,
-      //   })
-      //   .end();
+      const token = jwt.sign(
+        { _id: user._id },
+        NODE_ENV === 'production' ? SECRET_KEY : 'some-secret-key',
+        {
+          expiresIn: '7d',
+        },
+      );
+      return res
+        .cookie('token', token, {
+          maxAge: 3600000 * 24 * 7,
+          httpOnly: true,
+          sameSite: true,
+        })
+        .json({ message: 'Успешная авторизация' });
     })
     .catch(() => {
       next(new UnauthorizedError('Невалидный id пользователя'));
-      // return next(err);
     });
+};
+
+module.exports.logout = (req, res) => {
+  res.status(200).clearCookie('token', {
+    httpOnly: true,
+    sameSite: true,
+  }).json({ message: 'Вы вышли' });
 };
