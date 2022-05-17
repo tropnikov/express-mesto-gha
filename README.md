@@ -1,24 +1,25 @@
-[![Tests for sprint 13](https://github.com/tropnikov/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/tropnikov/express-mesto-gha/actions/workflows/tests-13-sprint.yml) 
+<!-- [![Tests for sprint 13](https://github.com/tropnikov/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/tropnikov/express-mesto-gha/actions/workflows/tests-13-sprint.yml)  -->
 
 <!-- [![Tests for sprint 14](https://github.com/tropnikov}/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/tropnikov/express-mesto-gha/actions/workflows/tests-14-sprint.yml) -->
 
 <!-- [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-13-sprint.yml) [![Tests](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml/badge.svg)](https://github.com/yandex-praktikum/express-mesto-gha/actions/workflows/tests-14-sprint.yml) -->
 
-# Проект Mesto бэкенд
+# Mesto Backend
 
 https://github.com/tropnikov/express-mesto-gha
 
-## Обзор
+## Summary
 
-Бэкенд проекта Место на Express.js. Для хранения данных используется MongoDB.
+Backend for Mesto project written with Express.js framework. MongoDB is used as a database.
+Written as one of the projects on Web-developer course on Yandex.Practicum.
 
-## Директории
+## Folders
 
-`/routes` — папка с файлами роутера  
-`/controllers` — папка с файлами контроллеров пользователя и карточки   
-`/models` — папка с файлами описания схем пользователя и карточки  
+`/routes` — routes  
+`/controllers` — controllers for users and cards  
+`/models` — schemas for users and cards
   
-## Запуск
+## Run it locally
 
-`npm run start` — запускает сервер   
-`npm run dev` — запускает сервер с hot-reload
+`npm run start` — starts the server   
+`npm run dev` — starts the server with hot-reload
